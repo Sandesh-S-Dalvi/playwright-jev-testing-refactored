@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Shop Fixture</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 2rem auto; }
+    .step { display: none; }
+    .step.active { display: block; }
+    .banner { padding: 0.5rem 1rem; margin: 1rem 0; border-radius: 4px; }
+    .banner.ok { background: #e6ffed; }
+    .banner.err { background: #ffe6e6; }
+    button { margin: 0.25rem; }
+    input { display: block; margin: 0.5rem 0; padding: 0.4rem; width: 100%; }
+  </style>
+</head>
+<body>
+  <h1>Demo Shop</h1>
+  <div id="banner" class="banner" hidden></div>
+
+  <main>
+    <section class="step active" id="step-login">
+      <h2>Sign in</h2>
+      <label for="username">Username</label>
+      <input id="username" type="text" autocomplete="username" />
+      <label for="password">Password</label>
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password" />
+      <button type="button" id="sign-in">Sign in</button>
+    </section>
+
+    <section class="step" id="step-products">
+      <h2>Products</h2>
+      <p>Choose one product to add to your cart.</p>
+      <ul id="product-list"></ul>
+      <button type="button" id="add-to-cart" disabled>Add to cart</button>
+    </section>
+
+    <section class="step" id="step-cart">
+      <h2>Your cart</h2>
+      <ul id="cart-list"></ul>
+      <p class="total" id="cart-total">Total: $0.00</p>
+      <button type="button" id="checkout">Checkout</button>
+    </section>
+
+    <section class="step" id="step-done">
+      <h2>Order confirmed</h2>
+      <p id="confirmation-text">Thank you. Your order has been placed.</p>
+      <p id="order-id">Order ID: none</p>
+    </section>
+  </main>
+
+  <script>
+    const PRODUCTS = [
+      { id: "p1", name: "Aurora Desk Lamp", price: 49.0 },
+      { id: "p2", name: "Basalt Coffee Mug", price: 18.5 },
+      { id: "p3", name: "Cirrus Backpack", price: 129.0 },
+    ];
+
+    const state = { signedIn: false, selected: null, cart: [], orderId: null };
+
+    const banner = document.getElementById("banner");
+    const productList = document.getElementById("product-list");
+    const cartList = document.getElementById("cart-list");
+    const cartTotal = document.getElementById("cart-total");
+    const addToCart = document.getElementById("add-to-cart");
+    const orderIdEl = document.getElementById("order-id");
+
+    function showBanner(message, kind) {
+      banner.hidden = false;
+      banner.textContent = message;
+      banner.className = "banner " + kind;
+    }
+
+    function go(stepId) {
+      document.querySelectorAll(".step").forEach((s) => s.classList.remove("active"));
+      document.getElementById(stepId).classList.add("active");
+    }
+
+    document.getElementById("sign-in").addEventListener("click", () => {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      if (!username || !password) {
+        showBanner("Enter a username and password to continue.", "err");
+        return;
+      }
+      state.signedIn = true;
+      showBanner("Signed in as " + username + ".", "ok");
+      renderProducts();
+      go("step-products");
+    });
+
+    function renderProducts() {
+      productList.innerHTML = "";
+      for (const p of PRODUCTS) {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = "Select " + p.name;
+        btn.addEventListener("click", () => {
+          state.selected = p;
+          addToCart.disabled = false;
+          showBanner("Selected " + p.name + ".", "ok");
+        });
+        li.appendChild(btn);
+        productList.appendChild(li);
+      }
+    }
+
+    addToCart.addEventListener("click", () => {
+      if (!state.selected) return;
+      state.cart = [state.selected];
+      renderCart();
+      go("step-cart");
+    });
+
+    function renderCart() {
+      cartList.innerHTML = "";
+      let total = 0;
+      for (const item of state.cart) {
+        const li = document.createElement("li");
+        li.textContent = item.name + " — $" + item.price.toFixed(2);
+        cartList.appendChild(li);
+        total += item.price;
+      }
+      cartTotal.textContent = "Total: $" + total.toFixed(2);
+    }
+
+    document.getElementById("checkout").addEventListener("click", () => {
+      state.orderId = "ORD-" + Math.floor(Math.random() * 9000 + 1000);
+      orderIdEl.textContent = "Order ID: " + state.orderId;
+      go("step-done");
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "name": "playwright-jev-testing",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Goal-driven Playwright E2E testing where Jev (TypeSafe System One) decides the next action, Playwright executes, and deterministic code asserts.",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:mock": "JEV_PROVIDER=mock playwright test",
+    "test:report": "playwright show-report",
+    "typecheck": "tsc --noEmit",
+    "record": "tsx scripts/trace.ts",
+    "setup": "playwright install chromium"
+  },
+  "dependencies": {
+    "@typesafe-ai/sdk": "^0.7.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^22.0.0",
+    "http-server": "^14.1.1",
+    "tsx": "^4.20.0",
+    "typescript": "^7.0.2"
+  }
+}
